@@ -262,6 +262,7 @@ metric:
     valueLabel: Value style
   label: Metric
 record:
+  hideAddButton: Users will be able to add new records
   referenceRecordField: Reference record field
   referenceRecordFieldPlaceholder: Select reference record selector
   referenceRecordFieldDescription: Multi value record selector fields are not available
@@ -296,6 +297,7 @@ record:
     condition: Condition
     tooltip:
       performance: Using conditional fields will impact performance
+  addRecordViaSelectorField: Add record via selector field
 recordList:
   addRecord: Add
   cancelSelection: Cancel
@@ -529,6 +531,7 @@ recordList:
     textStyles: Text Styles
     configureNonWrappingFelids: Configure non-wrapping fields
     showFullText: Show full text
+    addThroughSelectField: Add a record through a select field
   recordPage: record page
   refField:
     footnote: Field that links records with the parent record

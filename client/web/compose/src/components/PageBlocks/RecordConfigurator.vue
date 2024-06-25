@@ -64,6 +64,39 @@
           lg="6"
         >
           <b-form-group
+            :label="$t('record.hideAddButton')"
+            label-class="text-primary"
+          >
+            <c-input-checkbox
+              v-model="options.hideAddButton"
+              switch
+              invert
+              :labels="checkboxLabel"
+            />
+          </b-form-group>
+        </b-col>
+
+        <b-col
+          cols="12"
+          lg="6"
+        >
+          <b-form-group
+            :label="$t('record.addRecordViaSelectorField')"
+            label-class="text-primary"
+          >
+            <b-form-select
+              v-model="options.recordSelectorAddRecordDisplayOption"
+              :options="recordDisplayOptions"
+              :disabled="options.hideAddButton"
+            />
+          </b-form-group>
+        </b-col>
+
+        <b-col
+          cols="12"
+          lg="6"
+        >
+          <b-form-group
             :label="$t('record.inlineEdit.enabled')"
             label-class="text-primary"
           >
