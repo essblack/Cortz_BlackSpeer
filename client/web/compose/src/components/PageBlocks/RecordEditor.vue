@@ -14,12 +14,18 @@
     <div
       v-else-if="module"
       class="mt-3 px-3"
+      :class="{
+        'd-flex flex-column flex-fill': options.recordFieldLayoutOption === 'default',
+        'd-flex flex-fill flex-wrap gap-2': options.recordFieldLayoutOption === 'wrap',
+        'd-flex flex-fill gap-2': options.recordFieldLayoutOption === 'noWrap',
+      }"
     >
       <template v-for="field in fields">
         <div
           v-if="canDisplay(field)"
           :key="field.id"
-          class="field-container mb-3"
+          class="field-container flex-fill"
+          style="min-width: 13rem;"
         >
           <field-editor
             v-if="isFieldEditable(field)"
