@@ -96,7 +96,7 @@
           lg="6"
         >
           <b-form-group
-            :label="$t('record.fieldsLayoutMode')"
+            :label="$t('record.fieldsLayoutMode.label')"
             label-class="text-primary"
           >
             <c-input-select
@@ -280,9 +280,9 @@ export default {
 
     recordFieldLayoutOptions () {
       return [
-        { value: 'default', label: this.$t('record.defaultFieldsLayoutMode') },
-        { value: 'noWrap', label: this.$t('record.noWrapFieldsLayoutMode') },
-        { value: 'wrap', label: this.$t('record.wrapFieldsLayoutMode') },
+        { value: 'default', label: this.$t('record.fieldsLayoutMode.default') },
+        { value: 'noWrap', label: this.$t('record.fieldsLayoutMode.noWrap') },
+        { value: 'wrap', label: this.$t('record.fieldsLayoutMode.wrap') },
       ]
     },
 

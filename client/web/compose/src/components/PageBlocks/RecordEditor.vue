@@ -13,12 +13,8 @@
 
     <div
       v-else-if="module"
-      class="mt-3 px-3"
-      :class="{
-        'd-flex flex-column flex-fill': options.recordFieldLayoutOption === 'default',
-        'd-flex flex-fill flex-wrap gap-2': options.recordFieldLayoutOption === 'wrap',
-        'd-flex flex-fill gap-2': options.recordFieldLayoutOption === 'noWrap',
-      }"
+      class="mt-3 px-3 d-flex gap-2 flex-fill"
+      :class="fieldLayoutClass"
     >
       <template v-for="field in fields">
         <div
@@ -46,7 +42,9 @@
               <div
                 class="d-flex align-items-center text-primary mb-0"
               >
-                <span class="d-inline-block mw-100">
+                <span
+                  class="d-flex"
+                >
                   {{ field.label || field.name }}
                 </span>
 
@@ -139,6 +137,16 @@ export default {
         f.label = f.isSystem ? this.$t(`field:system.${f.name}`) : f.label || f.name
         return f
       })
+    },
+
+    fieldLayoutClass () {
+      const classes = {
+        default: 'flex-column',
+        noWrap: '',
+        wrap: 'flex-wrap',
+      }
+
+      return classes[this.options.recordFieldLayoutOption]
     },
 
     errorID () {

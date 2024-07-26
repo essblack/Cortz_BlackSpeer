@@ -51,7 +51,7 @@ export class PageBlockRecord extends PageBlock {
     if (o.fields) {
       this.options.fields = o.fields
     }
-
+ 
     if (o.fieldConditions) {
       this.options.fieldConditions = o.fieldConditions
     }
