@@ -4,7 +4,6 @@
     v-on="$listeners"
     @refreshBlock="refresh"
   >
-    <!-- <div class="d-flex justify-content-end"> -->
     <template>
       <b-button
         variant="outline-light"
@@ -43,94 +42,12 @@
                 label-class="text-primary"
               >
                 <c-input-select
-                  v-model="selectedFilter"
+                  v-model="liveFilterValue"
                   :options="predefinedFilters"
                   label="text"
                   :reduce="filter => filter.value"
                   :placeholder="$t('chart:edit.filter.noFilter')"
                 />
-              </b-form-group>
-            </b-col>
-
-            <b-col
-              v-if="selectedFilter === 'custom'"
-              cols="12"
-              lg="12"
-            >
-              <b-row>
-                <b-col
-                  cols="12"
-                  md="6"
-                >
-                  <b-form-group
-                    :label="'Start'"
-                    label-class="text-primary"
-                  >
-                    <c-input-date-time
-                      v-model="customDate.start"
-                      :no-date="false"
-                      :no-time="true"
-                      :only-future="false"
-                      :only-past="false"
-                      :labels="{
-                        clear: $t('general:label.clear'),
-                        none: $t('general:label.none'),
-                        now: $t('general:label.now'),
-                        today: $t('general:label.today'),
-                      }"
-                    />
-                  </b-form-group>
-                </b-col>
-                <b-col
-                  cols="12"
-                  md="6"
-                >
-                  <b-form-group
-                    :label="'End'"
-                    label-class="text-primary"
-                  >
-                    <c-input-date-time
-                      v-model="customDate.end"
-                      :no-date="false"
-                      :no-time="true"
-                      :only-future="false"
-                      :only-past="false"
-                      :labels="{
-                        clear: $t('general:label.clear'),
-                        none: $t('general:label.none'),
-                        now: $t('general:label.now'),
-                        today: $t('general:label.today'),
-                      }"
-                    />
-                  </b-form-group>
-                </b-col>
-              </b-row>
-            </b-col>
-
-            <!-- Configure report filters -->
-            <b-col
-              cols="12"
-              class="mt-1"
-            >
-              <b-form-group
-                :label="$t('chart:edit.filter.label')"
-                label-class="text-primary"
-              >
-                <b-form-textarea
-                  v-model="liveFilterValue"
-                  :placeholder="$t('chart:edit.filter.placeholder')"
-                />
-
-                <i18next
-                  path="chart:edit.filter.footnote"
-                  tag="small"
-                  class="text-muted"
-                >
-                  <code>${record.values.fieldName}</code>
-                  <code>${recordID}</code>
-                  <code>${ownerID}</code>
-                  <span><code>${userID}</code>, <code>${user.name}</code></span>
-                </i18next>
               </b-form-group>
             </b-col>
           </b-row>
@@ -150,15 +67,11 @@
 </template>
 
 <script>
-import moment from 'moment'
 import { mapActions } from 'vuex'
 import base from './base'
 import ChartComponent from '../Chart'
 import { NoID, compose } from '@cortezaproject/corteza-js'
 import { evaluatePrefilter, isFieldInFilter } from 'corteza-webapp-compose/src/lib/record-filter'
-import { components } from '@cortezaproject/corteza-vue'
-
-const { CInputDateTime } = components
 
 export default {
   i18nOptions: {
@@ -167,7 +80,6 @@ export default {
 
   components: {
     ChartComponent,
-    CInputDateTime,
   },
 
   extends: base,
@@ -187,7 +99,6 @@ export default {
 
       predefinedFilters: [
         ...compose.chartUtil.predefinedFilters.map(pf => ({ ...pf, text: this.$t(`chart:edit.filter.${pf.text}`) })),
-        { text: 'Custom', value: 'custom' },
       ],
 
       selectedFilter: undefined,
@@ -207,29 +118,6 @@ export default {
       handler () {
         this.refresh()
       },
-    },
-    customDate: {
-      deep: true,
-      handler (date) {
-        const startDateTime = moment(new Date(date.start), 'YYYY-MM-DDTHH:mm:ssZ', true)
-        const endDateTime = moment(new Date(date.end), 'YYYY-MM-DDTHH:mm:ssZ', true)
-        const name = 'createdAt'
-
-        const dataFmtEntry = (date) => `TIMESTAMP(DATE_FORMAT('${date.format()}', '%Y-%m-%dT%H:%i:00.%f+00:00'))`
-
-        if (startDateTime.isValid() && endDateTime.isValid()) {
-          this.liveFilterValue = `TIMESTAMP(DATE_FORMAT(${name}, '%Y-%m-%dT%H:%i:00.%f+00:00'))` + 'BETWEEN' + `${dataFmtEntry(startDateTime)} ${dataFmtEntry(endDateTime)}`
-        }
-      },
-    },
-    selectedFilter: {
-      deep: true,
-      handler (value) {
-        if (value !== 'custom') {
-          this.liveFilterValue = value
-        }
-      },
-
     },
   },
 
@@ -413,7 +301,6 @@ export default {
 
 <style lang="scss" scoped>
 .livefilter-btn {
-  /* text-primary px-2 mt-2 mr-2 position-absolute right-0 z-1 */
   display: flex;
   align-items: center;
   margin-left: auto;
