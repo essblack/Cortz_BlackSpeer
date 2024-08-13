@@ -12,7 +12,8 @@
 
     <div
       v-else-if="fieldModule"
-      class="mt-3 px-3 d-flex gap-2 flex-fill"
+      ref="fieldContainer"
+      class="mt-3 px-3"
       :class="fieldLayoutClass"
     >
       <template v-for="field in fields">
@@ -23,8 +24,8 @@
           :label-cols-xl="options.horizontalFieldLayoutEnabled && '5'"
           :content-cols-md="options.horizontalFieldLayoutEnabled && '6'"
           :content-cols-xl="options.horizontalFieldLayoutEnabled && '7'"
-          class="field-container flex-fill mb-0"
-          style="min-width: 13rem;"
+          :class="columnClass"
+          :style="fieldWidth"
         >
           <template #label>
             <div
@@ -109,6 +110,7 @@ import BulkEditModal from 'corteza-webapp-compose/src/components/Public/Record/B
 import users from 'corteza-webapp-compose/src/mixins/users'
 import records from 'corteza-webapp-compose/src/mixins/records'
 import conditionalFields from 'corteza-webapp-compose/src/mixins/conditionalFields'
+import recordLayout from 'corteza-webapp-compose/src/mixins/recordLayout'
 
 export default {
   i18nOptions: {
@@ -126,6 +128,7 @@ export default {
     users,
     records,
     conditionalFields,
+    recordLayout,
   ],
 
   data () {
@@ -163,9 +166,9 @@ export default {
 
     fieldLayoutClass () {
       const classes = {
-        default: 'flex-column',
-        noWrap: '',
-        wrap: 'flex-wrap',
+        default: 'd-flex flex-column',
+        noWrap: 'd-flex gap-2',
+        wrap: 'row no-gutters',
       }
 
       return classes[this.options.recordFieldLayoutOption]
@@ -181,6 +184,14 @@ export default {
 
     processing () {
       return !this.fieldRecord || this.evaluating
+    },
+
+    fieldWidth () {
+      if (this.options.recordFieldLayoutOption !== 'noWrap') {
+        return {}
+      }
+
+      return { 'min-width': '13rem' }
     },
   },
 
@@ -221,6 +232,28 @@ export default {
       handler (options) {
         if (options.referenceModuleID) {
           this.fetchReferenceModule(options.referenceModuleID)
+        }
+      },
+    },
+
+    processing: {
+      handler (newVal) {
+        if (this.options.recordFieldLayoutOption !== 'wrap') return
+
+        if (!newVal && this.fieldModule) {
+          this.$nextTick(() => {
+            this.initializeResizeObserver(this.$refs.fieldContainer, this.options.recordFieldLayoutOption)
+          })
+        }
+      },
+    },
+
+    'options.recordFieldLayoutOption': {
+      handler (newVal) {
+        if (newVal === 'wrap' && this.fieldModule) {
+          this.initializeResizeObserver(this.$refs.fieldContainer, this.options.recordFieldLayoutOption)
+        } else if (this.resizeObserver) {
+          this.resizeObserver.unobserve(this.$refs.fieldContainer)
         }
       },
     },
@@ -347,3 +380,10 @@ export default {
   },
 }
 </script>
+
+<style scoped>
+.field-col > * {
+  margin-left: 1rem;
+  margin-right: 1rem;
+}
+</style>

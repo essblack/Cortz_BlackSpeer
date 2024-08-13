@@ -13,15 +13,16 @@
 
     <div
       v-else-if="module"
-      class="mt-3 px-3 d-flex gap-2 flex-fill"
+      ref="fieldContainer"
+      class="mt-3 px-3"
       :class="fieldLayoutClass"
     >
       <template v-for="field in fields">
         <div
           v-if="canDisplay(field)"
           :key="field.id"
-          class="field-container flex-fill"
-          style="min-width: 13rem;"
+          :class="columnClass"
+          :style="fieldWidth"
         >
           <field-editor
             v-if="isFieldEditable(field)"
@@ -92,6 +93,7 @@ import records from 'corteza-webapp-compose/src/mixins/records'
 import FieldEditor from 'corteza-webapp-compose/src/components/ModuleFields/Editor'
 import FieldViewer from 'corteza-webapp-compose/src/components/ModuleFields/Viewer'
 import conditionalFields from 'corteza-webapp-compose/src/mixins/conditionalFields'
+import recordLayout from 'corteza-webapp-compose/src/mixins/recordLayout'
 import { debounce } from 'lodash'
 
 export default {
@@ -110,6 +112,7 @@ export default {
     users,
     records,
     conditionalFields,
+    recordLayout,
   ],
 
   props: {
@@ -141,12 +144,20 @@ export default {
 
     fieldLayoutClass () {
       const classes = {
-        default: 'flex-column',
-        noWrap: '',
-        wrap: 'flex-wrap',
+        default: 'd-flex flex-column',
+        noWrap: 'd-flex gap-2',
+        wrap: 'row no-gutters',
       }
 
       return classes[this.options.recordFieldLayoutOption]
+    },
+
+    fieldWidth () {
+      if (this.options.recordFieldLayoutOption !== 'noWrap') {
+        return {}
+      }
+
+      return { 'min-width': '13rem' }
     },
 
     errorID () {
@@ -190,6 +201,24 @@ export default {
         })
       },
     },
+
+    processing: {
+      handler (newVal) {
+        if (this.options.recordFieldLayoutOption !== 'wrap') return
+
+        if (!newVal && this.module) {
+          this.$nextTick(() => {
+            this.initializeResizeObserver(this.$refs.fieldContainer)
+          })
+        } else if (this.resizeObserver) {
+          this.resizeObserver.unobserve(this.$refs.fieldContainer)
+        }
+      },
+    },
+  },
+
+  beforeDestroy () {
+    this.destroyEvents(this.$refs.fieldContainer)
   },
 
   methods: {
@@ -239,3 +268,10 @@ export default {
   },
 }
 </script>
+
+<style scoped>
+.field-col > * {
+  margin-left: 1rem;
+  margin-right: 1rem;
+}
+</style>
