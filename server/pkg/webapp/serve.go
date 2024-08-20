@@ -159,8 +159,8 @@ func serveConfig(r chi.Router, config webappConfig) {
 		_, _ = fmt.Fprint(w, stylesheet)
 	})
 
-	// serve cdns-provider.js
-	r.Get(options.CleanBase(config.appUrl, "cdns-provider.js"), func(w http.ResponseWriter, r *http.Request) {
+	// serve code-snippets.js
+	r.Get(options.CleanBase(config.appUrl, "code-snippets.js"), func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Content-Type", "text/javascript")
 
 		cdns := service.CurrentSettings.CDNs
@@ -178,7 +178,7 @@ func serveConfig(r chi.Router, config webappConfig) {
 		scriptsAttrs := traverseScriptsNode(doc)
 
 		//create a javascript array of objects
-		cdnJsonScripts, err := json.Marshal(scriptsAttrs)
+		cdnScriptsJson, err := json.Marshal(scriptsAttrs)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -187,29 +187,31 @@ func serveConfig(r chi.Router, config webappConfig) {
 			`
 const cdnScripts = %s;
 
-cdnScripts.forEach(cdnScript => {
-    const scriptAttr = document.createElement("script");
-    
-    if (cdnScript.src) {
-        scriptAttr.src = cdnScript.src;
-    }
-    
-    if (cdnScript.integrity) {
-        scriptAttr.integrity = cdnScript.integrity;
-    }
-    
-    if (cdnScript.crossorigin) {
-        scriptAttr.crossOrigin = cdnScript.crossorigin;
-    }
+if (cdnScripts !== null) {
+	cdnScripts.forEach(cdnScript => {
+		const scriptAttr = document.createElement("script");
+		
+		if (cdnScript.src) {
+			scriptAttr.src = cdnScript.src;
+		}
+		
+		if (cdnScript.integrity) {
+			scriptAttr.integrity = cdnScript.integrity;
+		}
+		
+		if (cdnScript.crossorigin) {
+			scriptAttr.crossOrigin = cdnScript.crossorigin;
+		}
 
-    if (cdnScript.content) {
-        scriptAttr.textContent = cdnScript.content;
-    }
-    
-    document.head.appendChild(scriptAttr);
-});
+		if (cdnScript.content) {
+			scriptAttr.textContent = cdnScript.content;
+		}
+		
+		document.head.appendChild(scriptAttr);
+	});		
+}
 
-            `, string(cdnJsonScripts))
+            `, string(cdnScriptsJson))
 
 		_, _ = fmt.Fprint(w, jsScripts)
 	})
