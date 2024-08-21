@@ -12,4 +12,4 @@ editor:
         label: Provider
       value:
         label: Script value
-        description: Ensure that your CDN links are within <script> tags to properly inject them into Corteza web applications.
+        description: Ensure that your Code snippets are within <script> tags to properly inject them into Corteza web applications.

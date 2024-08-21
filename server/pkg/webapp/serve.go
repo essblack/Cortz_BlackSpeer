@@ -163,14 +163,14 @@ func serveConfig(r chi.Router, config webappConfig) {
 	r.Get(options.CleanBase(config.appUrl, "code-snippets.js"), func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Content-Type", "text/javascript")
 
-		cdns := service.CurrentSettings.CDNs
+		codeSnippets := service.CurrentSettings.CodeSnippets
 
-		cdnScripts := ""
-		for _, cdn := range cdns {
-			cdnScripts += cdn.CdnScript
+		snippetScripts := ""
+		for _, snippet := range codeSnippets {
+			snippetScripts += snippet.Script
 		}
 
-		doc, err := html.Parse(strings.NewReader(cdnScripts))
+		doc, err := html.Parse(strings.NewReader(snippetScripts))
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -178,40 +178,40 @@ func serveConfig(r chi.Router, config webappConfig) {
 		scriptsAttrs := traverseScriptsNode(doc)
 
 		//create a javascript array of objects
-		cdnScriptsJson, err := json.Marshal(scriptsAttrs)
+		snippetScriptsJson, err := json.Marshal(scriptsAttrs)
 		if err != nil {
 			log.Fatal(err)
 		}
 
 		jsScripts := fmt.Sprintf(
 			`
-const cdnScripts = %s;
+const snippetScripts = %s;
 
-if (cdnScripts !== null) {
-	cdnScripts.forEach(cdnScript => {
+if (snippetScripts !== null) {
+	snippetScripts.forEach(snippetScript => {
 		const scriptAttr = document.createElement("script");
 		
-		if (cdnScript.src) {
-			scriptAttr.src = cdnScript.src;
+		if (snippetScript.src) {
+			scriptAttr.src = snippetScript.src;
 		}
 		
-		if (cdnScript.integrity) {
-			scriptAttr.integrity = cdnScript.integrity;
+		if (snippetScript.integrity) {
+			scriptAttr.integrity = snippetScript.integrity;
 		}
 		
-		if (cdnScript.crossorigin) {
-			scriptAttr.crossOrigin = cdnScript.crossorigin;
+		if (snippetScript.crossorigin) {
+			scriptAttr.crossOrigin = snippetScript.crossorigin;
 		}
 
-		if (cdnScript.content) {
-			scriptAttr.textContent = cdnScript.content;
+		if (snippetScript.content) {
+			scriptAttr.textContent = snippetScript.content;
 		}
 		
 		document.head.appendChild(scriptAttr);
 	});		
 }
 
-            `, string(cdnScriptsJson))
+            `, string(snippetScriptsJson))
 
 		_, _ = fmt.Fprint(w, jsScripts)
 	})

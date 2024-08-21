@@ -238,7 +238,7 @@ type (
 		// Integration gateway settings
 		Apigw ApigwSettings `kv:"apigw" json:"apigw"`
 
-		CDNs []struct{ CDNProvider } `kv:"cdns" json:"cdns"`
+		CodeSnippets []struct{ CodeSnippet } `kv:"code-snippets" json:"codeSnippets"`
 
 		// UserInterface settings
 		UI struct {
@@ -417,9 +417,9 @@ type (
 		Values string `json:"values"`
 	}
 
-	CDNProvider struct {
-		Name      string `json:"name"`
-		CdnScript string `json:"cdnScript"`
+	CodeSnippet struct {
+		Name   string `json:"name"`
+		Script string `json:"script"`
 	}
 
 	SmtpServers struct {

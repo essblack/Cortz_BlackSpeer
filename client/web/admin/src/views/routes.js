@@ -110,7 +110,7 @@ export default [
           r('system.connection.new', 'connection/new', 'System/Connection/Editor'),
           r('system.connection.edit', 'connection/edit/:connectionID', 'System/Connection/Editor'),
 
-          r('system.cdns', 'cdns', 'System/Cdns/Index'),
+          r('system.codesnippets', 'codesnippets', 'System/CodeSnippets/Index'),
 
           combo('system', 'sensitivityLevel'),
 

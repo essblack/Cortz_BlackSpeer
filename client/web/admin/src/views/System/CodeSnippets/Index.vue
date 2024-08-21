@@ -15,7 +15,7 @@
         <b-button
           variant="primary"
           size="lg"
-          @click="newCDN()"
+          @click="newCodeSnippet()"
         >
           {{ $t('code-snippets.add') }}
         </b-button>
@@ -23,7 +23,7 @@
 
       <b-table
         :items="providerItems"
-        :fields="cdnProviderFields"
+        :fields="codeSnippetProviderFields"
         head-variant="light"
         show-empty
         hover
@@ -63,7 +63,7 @@
       </b-table>
 
       <b-modal
-        id="modal-cdn"
+        id="modal-codeSnippet"
         v-model="modal.open"
         :title="modal.title"
         scrollable
@@ -91,7 +91,7 @@
           </div>
 
           <c-ace-editor
-            v-model="modal.data.cdnScript"
+            v-model="modal.data.script"
             lang="javascript"
             height="500px"
             font-size="14px"
@@ -105,7 +105,7 @@
           <c-input-confirm
             size="md"
             variant="danger"
-            @confirmed="deleteCDN(modal.index)"
+            @confirmed="deleteCodeSnippet(modal.index)"
           >
             {{ $t('general:label.delete') }}
           </c-input-confirm>
@@ -130,8 +130,8 @@
       <template #footer>
         <c-button-submit
           :disabled="!canManage"
-          :processing="cdn.processing"
-          :success="cdn.success"
+          :processing="codeSnippet.processing"
+          :success="codeSnippet.success"
           :text="$t('admin:general.label.submit')"
           class="ml-auto"
           @submit="onSubmit()"
@@ -148,10 +148,10 @@ import { mapGetters } from 'vuex'
 const { CAceEditor } = components
 
 export default {
-  name: 'CSystemCdnEditor',
+  name: 'CSystemCodeSnippetEditor',
 
   i18nOptions: {
-    namespaces: 'system.cdns',
+    namespaces: 'system.code-snippets',
     keyPrefix: 'editor',
   },
 
@@ -165,7 +165,7 @@ export default {
 
   data () {
     return {
-      cdns: [],
+      codeSnippets: [],
       modal: {
         open: false,
         editor: null,
@@ -174,11 +174,11 @@ export default {
         index: null,
       },
 
-      cdn: {
+      codeSnippet: {
         processing: false,
         success: false,
       },
-      originalCdns: [],
+      originalCodeSnippets: [],
     }
   },
 
@@ -187,7 +187,7 @@ export default {
       canManage: 'rbac/can',
     }),
 
-    cdnProviderFields () {
+    codeSnippetProviderFields () {
       return [
         { key: 'provider', label: this.$t('code-snippets.table-headers.provider'), thStyle: { width: '200px' }, tdClass: 'text-capitalize' },
         { key: 'value', label: this.$t('code-snippets.table-headers.value'), tdClass: 'td-content-overflow' },
@@ -196,16 +196,16 @@ export default {
     },
 
     providerItems () {
-      return this.cdns.map((s, i) => ({
+      return this.codeSnippets.map((s, i) => ({
         provider: s.name,
-        value: s.cdnScript,
+        value: s.script,
 
         editor: {
           data: s,
           index: i,
           title: s.name,
           updater: (changed) => {
-            this.cdns[i] = changed
+            this.codeSnippets[i] = changed
           },
         },
       }))
@@ -215,7 +215,7 @@ export default {
   created () {
     this.fetchSettings()
 
-    this.originalCdns = [...this.cdns]
+    this.originalCodeSnippets = [...this.codeSnippets]
   },
   methods: {
     openEditor ({ component, title, data, updater }) {
@@ -228,59 +228,59 @@ export default {
       this.modal.data = data
     },
 
-    newCDN () {
+    newCodeSnippet () {
       this.openEditor({
         title: this.$t('code-snippets.add'),
         data: {
           name: '',
-          cdnScript: '<' + 'script> ' + '</' + 'script>',
+          script: '<' + 'script> ' + '</' + 'script>',
         },
         updater: (changed) => {
-          this.cdns.push(changed)
+          this.codeSnippets.push(changed)
         },
       })
     },
     fetchSettings () {
       this.incLoader()
       this.$Settings.fetch()
-      return this.$SystemAPI.settingsList({ prefix: 'cdns' })
+      return this.$SystemAPI.settingsList({ prefix: 'code-snippets' })
         .then(settings => {
           if (settings && settings[0]) {
-            this.cdns = settings[0].value
+            this.codeSnippets = settings[0].value
           } else {
-            this.cdns = []
+            this.codeSnippets = []
           }
         })
-        .catch(this.toastErrorHandler(this.$t('notification:settings.cdn.fetch.error')))
+        .catch(this.toastErrorHandler(this.$t('notification:settings.codeSnippet.fetch.error')))
         .finally(() => {
           this.decLoader()
         })
     },
 
     settingsUpdate (action) {
-      this.cdn.processing = true
-      this.$SystemAPI.settingsUpdate({ values: [{ name: 'cdns', value: this.cdns }] })
+      this.codeSnippet.processing = true
+      this.$SystemAPI.settingsUpdate({ values: [{ name: 'code-snippets', value: this.codeSnippets }] })
         .then(() => {
-          this.animateSuccess('cdn')
+          this.animateSuccess('codeSnippet')
           if (action === 'delete') {
-            this.toastSuccess(this.$t('notification:settings.cdn.delete.success'))
+            this.toastSuccess(this.$t('notification:settings.codeSnippet.delete.success'))
           } else {
-            this.toastSuccess(this.$t('notification:settings.cdn.update.success'))
+            this.toastSuccess(this.$t('notification:settings.codeSnippet.update.success'))
           }
         })
-        .catch(this.toastErrorHandler(this.$t('notification:settings.cdn.update.error')))
+        .catch(this.toastErrorHandler(this.$t('notification:settings.codeSnippet.update.error')))
         .finally(() => {
-          this.cdn.processing = false
+          this.codeSnippet.processing = false
         })
     },
     onSubmit () {
       this.settingsUpdate('update')
     },
 
-    deleteCDN (i) {
-      this.cdns.splice(i, 1)
+    deleteCodeSnippet (i) {
+      this.codeSnippets.splice(i, 1)
       this.settingsUpdate('delete')
-      this.$bvModal.hide('modal-cdn')
+      this.$bvModal.hide('modal-codeSnippet')
     },
   },
 }

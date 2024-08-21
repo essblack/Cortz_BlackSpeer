@@ -268,7 +268,7 @@ settings:
     update:
       success: UI settings updated
       error: UI settings update failed
-  cdn:
+  code-snippet:
     fetch:
       error: Code snippets settings fetch failed
     update:

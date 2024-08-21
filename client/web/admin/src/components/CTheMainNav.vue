@@ -121,8 +121,8 @@ export default {
               can: ['system/', 'dal-connections.search'],
             },
             {
-              label: 'system.items.cdns',
-              route: 'system.cdns',
+              label: 'system.items.code-snippets',
+              route: 'system.codesnippets',
               icon: 'file-code',
               can: ['system/', 'settings.read'],
             },
