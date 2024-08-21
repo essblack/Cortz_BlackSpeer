@@ -40,6 +40,7 @@
             :options="moduleFields"
             :reduce="o => o.name"
             :placeholder="$t('recordList.import.pickModuleField')"
+            :class="{ 'border border-danger': data.item.selected && !data.item.moduleField }"
             @input="moduleChanged(data)"
           />
           <span
@@ -62,6 +63,7 @@
       </b-button>
 
       <b-button
+        v-b-tooltip.hover="foo"
         variant="primary"
         :disabled="!canContinue"
         class="float-right"
